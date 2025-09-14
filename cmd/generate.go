@@ -208,6 +208,13 @@ func runGenerate(cmd *cobra.Command, args []string) error {
 		// Copy approach: create writable copies (legacy method)
 		destDir := viper.GetString("snapshot.destination_dir")
 
+		// Clean up old snapshots for copy method
+		if viper.GetBool("behavior.cleanup_old_snapshots") {
+			if err := btrfsManager.CleanupOldSnapshots(destDir, selectionCount, r); err != nil {
+				log.Warn().Err(err).Msg("Failed to cleanup old snapshots")
+			}
+		}
+
 		for _, snapshot := range selectedSnapshots {
 			if snapshot.IsReadOnly {
 				log.Info().
@@ -222,13 +229,6 @@ func runGenerate(cmd *cobra.Command, args []string) error {
 				processedSnapshots = append(processedSnapshots, writableSnapshot)
 			} else {
 				processedSnapshots = append(processedSnapshots, snapshot)
-			}
-		}
-
-		// Clean up old snapshots for copy method
-		if viper.GetBool("behavior.cleanup_old_snapshots") {
-			if err := btrfsManager.CleanupOldSnapshots(destDir, selectionCount, r); err != nil {
-				log.Warn().Err(err).Msg("Failed to cleanup old snapshots")
 			}
 		}
 	} else {

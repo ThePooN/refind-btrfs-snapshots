@@ -232,7 +232,7 @@ func (m *Manager) CreateWritableSnapshot(snapshot *Snapshot, destDir string, r r
 	}
 
 	// Create btrfs snapshot
-	err := r.Command("btrfs", []string{"subvolume", "snapshot", snapshot.Path, destPath},
+	err := r.Command("btrfs", []string{"subvolume", "snapshot", snapshot.FilesystemPath, destPath},
 		fmt.Sprintf("Create writable snapshot: %s -> %s", snapshot.Path, destPath))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create writable snapshot: %w", err)
